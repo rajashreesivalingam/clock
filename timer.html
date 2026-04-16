@@ -2,120 +2,141 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Timer Clock</title>
+<title>Analog Timer Clock</title>
 <style>
     body {
         background: #0f172a;
-        font-family: arial, sans-serif;
+        color: white;
+        font-family: Arial, sans-serif;
         text-align: center;
-        color: #fff;
-    }
-    h1{
-        margin: top 200px;
     }
 
-    .clock 
-    {
-        background: #1e293b;
-        border: 8px solid #333;
+    h1 {
+        margin-top: 20px;
+    }
+
+    /* Analog Clock */
+    .clock {
         width: 250px;
         height: 250px;
-        border-radius: 20px;
+        border: 8px solid #333;
+        border-radius: 50%;
         margin: 30px auto;
-        position:relative;
-        
+        position: relative;
+        background: #111827;
     }
 
     .hand {
         position: absolute;
-        width:50%;
+        width: 50%;
         height: 2px;
-        background-color: #fff;
+        background: white;
         top: 50%;
         transform-origin: 100%;
         transform: rotate(90deg);
     }
-    .second{
-        background: #ef4444;
-        height: 2px;
-    }
-    .minute{
-        height:4px;
-    }
-    .hour{
-        height: 6px;
-        width: 35%;
-    }
-    .digital{
+
+    .second { background: red; height: 2px; }
+    .minute { height: 4px; }
+    .hour { height: 6px; width: 35%; }
+
+    /* Digital Timer */
+    .digital {
         font-size: 40px;
         margin: 20px;
         letter-spacing: 3px;
     }
 
-    .buttons{
+    /* Buttons */
+    .buttons {
         display: flex;
         justify-content: center;
         gap: 15px;
-    } 
+    }
+
     button {
         padding: 12px 25px;
+        font-size: 16px;
         border: none;
         border-radius: 8px;
-        font-size: 16px;
-        cursor:pointer;    
+        cursor: pointer;
     }
 
-    .start { background: #22c55e; color: white; }
-    .stop { background: #ef4444; color: white;}
-    .reset { background: #3b82f6; color: white;}
-
-    button:hover {
-        opacity: 0.8;
-    }
+    .start { background: green; color: white; }
+    .stop { background: red; color: white; }
+    .reset { background: gray; color: white; }
 </style>
 </head>
 <body>
 
-<div class="clock-container">
-    <div class="time" id="display">00:00:00</div>
-    <div class="buttons">
-        <button class="start" onclick="startTimer()">Start</button>
-        <button class="stop" onclick="stopTimer()">Stop</button>
-        <button class="reset" onclick="resetTimer()">Reset</button>
-    </div>
+<h1>Timer Clock</h1>
+
+<div class="clock">
+    <div class="hand hour" id="hour"></div>
+    <div class="hand minute" id="minute"></div>
+    <div class="hand second" id="second"></div>
+</div>
+
+<div class="digital" id="time">00:00:00</div>
+
+<div class="buttons">
+    <button class="start" onclick="startTimer()">Start</button>
+    <button class="stop" onclick="stopTimer()">Stop</button>
+    <button class="reset" onclick="resetTimer()">Reset</button>
 </div>
 
 <script>
-let seconds = 0;
-let interval = null;
+    // Analog Clock
+    function updateClock() {
+        const now = new Date();
 
-function updateDisplay() {
-    let hrs = String(Math.floor(seconds / 3600)).padStart(2, '0');
-    let mins = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-    let secs = String(seconds % 60).padStart(2, '0');
+        const sec = now.getSeconds();
+        const min = now.getMinutes();
+        const hr = now.getHours();
 
-    document.getElementById("display").textContent = `${hrs}:${mins}:${secs}`;
-}
+        document.getElementById("second").style.transform =
+            `rotate(${sec * 6}deg)`;
 
-function startTimer() {
-    if (!interval) {
-        interval = setInterval(() => {
-            seconds++;
-            updateDisplay();
-        }, 1000);
+        document.getElementById("minute").style.transform =
+            `rotate(${min * 6}deg)`;
+
+        document.getElementById("hour").style.transform =
+            `rotate(${hr * 30 + min / 2}deg)`;
     }
-}
 
-function stopTimer() {
-    clearInterval(interval);
-    interval = null;
-}
+    setInterval(updateClock, 1000);
 
-function resetTimer() {
-    stopTimer();
-    seconds = 0;
-    updateDisplay();
-}
+    // Timer
+    let seconds = 0;
+    let timer = null;
+
+    function updateTimer() {
+        seconds++;
+
+        let hrs = String(Math.floor(seconds / 3600)).padStart(2, '0');
+        let mins = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+        let secs = String(seconds % 60).padStart(2, '0');
+
+        document.getElementById("time").innerText =
+            `${hrs}:${mins}:${secs}`;
+    }
+
+    function startTimer() {
+        if (!timer) {
+            timer = setInterval(updateTimer, 1000);
+        }
+    }
+
+    function stopTimer() {
+        clearInterval(timer);
+        timer = null;
+    }
+
+    function resetTimer() {
+        stopTimer();
+        seconds = 0;
+        document.getElementById("time").innerText = "00:00:00";
+    }
 </script>
 
 </body>
